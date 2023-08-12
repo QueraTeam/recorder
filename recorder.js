@@ -21,6 +21,7 @@ async function record(url, username, password) {
         defaultViewport: {width: 1920, height: 1080},
         ignoreDefaultArgs: [
             "--mute-audio",
+            "--enable-automation"
         ],
         args: [
             "--no-sandbox",
@@ -28,7 +29,8 @@ async function record(url, username, password) {
             "--window-size=1920,1080",
             "--start-fullscreen",
             "--disable-notifications",
-        ]
+        ],
+        userDataDir: "./profile",
     });
     const page = await browser.newPage();
     await page.goto(url);
@@ -69,3 +71,7 @@ async function record(url, username, password) {
         xvfb.stopSync();
     });
 }
+
+const args = process.argv.slice(2);
+const [username, password, url] = args;
+record(url, username, password);
