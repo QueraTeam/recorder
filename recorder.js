@@ -2,7 +2,7 @@ var Xvfb = require('xvfb');
 var puppeteer = require('puppeteer');
 const { spawn, spawnSync } = require('child_process');
 
-async function record(url, username, password) {
+async function record(fileName, url, username, password) {
     var xvfb = new Xvfb({
         reuse: false,
         xvfb_args: [
@@ -40,8 +40,6 @@ async function record(url, username, password) {
     const listenerButton = await page.waitForSelector("div >>> ::-p-text(ورود به عنوان شنونده)");
     await listenerButton.click();
 
-    var time = new Date().getTime();
-
     var options = [
         "-video_size", "1920x1080",
         "-framerate", "30",
@@ -51,7 +49,7 @@ async function record(url, username, password) {
         "-f", "pulse",
         "-ac", "2",
         "-i", "default",
-        "/output/video/video" + time + ".mkv"
+        `/output/video/${fileName}.mkv`
     ];
 
     var cmd = 'ffmpeg';
@@ -73,5 +71,5 @@ async function record(url, username, password) {
 }
 
 const args = process.argv.slice(2);
-const [username, password, url] = args;
-record(url, username, password);
+const [fileName, username, password, url] = args;
+record(fileName, url, username, password);
