@@ -11,6 +11,6 @@ pacmd load-module module-virtual-sink sink_name=v1
 pacmd set-default-sink v1
 pacmd set-default-source v1.monitor
 mkdir -p /output/video/
-timeout ${RECORD_TIMEOUT} node recorder.js {FILE_NAME} ${USERNAME} ${PASSWORD} ${RECORD_URL}
+timeout ${RECORD_TIMEOUT} node recorder.js ${FILE_NAME} ${USERNAME} ${PASSWORD} ${RECORD_URL}
 ffmpeg -i /output/video/${FILE_NAME}.mkv -codec copy /output/video/${FILE_NAME}.mp4
 rm /output/video/${FILE_NAME}.mkv
