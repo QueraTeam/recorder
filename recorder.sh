@@ -5,6 +5,10 @@ FILE_NAME=${2}
 USERNAME=${3}
 PASSWORD=${4}
 RECORD_URL=${5}
+VOD_API_KEY=${6}
+VOD_BASE_URL=${7}
+VOD_CHANNEL_KEY=${8}
+
 
 pulseaudio -D --exit-idle-time=-1
 pacmd load-module module-virtual-sink sink_name=v1
@@ -14,3 +18,4 @@ mkdir -p /output/video/
 timeout ${RECORD_TIMEOUT} node recorder.js ${FILE_NAME} ${USERNAME} ${PASSWORD} ${RECORD_URL}
 ffmpeg -i /output/video/${FILE_NAME}.mkv -codec copy /output/video/${FILE_NAME}.mp4
 rm /output/video/${FILE_NAME}.mkv
+venv/bin/python uploader.py "${VOD_API_KEY}" ${VOD_BASE_URL} ${VOD_CHANNEL_KEY} /output/video/${FILE_NAME}.mp4
