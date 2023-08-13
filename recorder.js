@@ -49,6 +49,7 @@ async function record(fileName, url, username, password) {
         "-f", "pulse",
         "-ac", "2",
         "-i", "default",
+        "-vf", "format=yuv420p",
         `/output/video/${fileName}.mkv`
     ];
 
