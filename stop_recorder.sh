@@ -1,2 +1,2 @@
 #!/bin/bash
-killall ffmpeg
+pkill ffmpeg

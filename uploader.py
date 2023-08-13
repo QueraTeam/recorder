@@ -121,6 +121,10 @@ class ArvanVODBackend:
         arvan_video_uuid = result["data"]["id"]
         self.uuid = arvan_video_uuid
 
+    def send_video_uuid(self):
+        callback_url = sys.argv[5]
+        requests.post(callback_url, json={"video_uuid": self.uuid})
+
     def check_file_is_ready(self, uuid):
         api_key = ArvanVODConfigs.api_key
         arvan_vod_url = ArvanVODConfigs.arvan_vod_url
@@ -145,6 +149,7 @@ def run():
         res, status = arvan.handle_upload(file_name, "video/mp4", file_size, input_file)
         if status == 200:
             arvan.after_upload(file_name)
+            arvan.send_video_uuid()
         print(res, status)
 
 
