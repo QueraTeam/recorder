@@ -16,6 +16,4 @@ pacmd set-default-sink v1
 pacmd set-default-source v1.monitor
 mkdir -p /output/video/
 timeout ${RECORD_TIMEOUT} node recorder.js ${FILE_NAME} ${USERNAME} ${PASSWORD} ${RECORD_URL}
-ffmpeg -i /output/video/${FILE_NAME}.mkv -codec copy /output/video/${FILE_NAME}.mp4
-rm /output/video/${FILE_NAME}.mkv
 venv/bin/python uploader.py "${VOD_API_KEY}" ${VOD_BASE_URL} ${VOD_CHANNEL_KEY} /output/video/${FILE_NAME}.mp4

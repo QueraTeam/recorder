@@ -50,7 +50,7 @@ async function record(fileName, url, username, password) {
         "-ac", "2",
         "-i", "default",
         "-vf", "format=yuv420p",
-        `/output/video/${fileName}.mkv`
+        `/output/video/${fileName}.mp4`
     ];
 
     var cmd = 'ffmpeg';
