@@ -122,8 +122,11 @@ class ArvanVODBackend:
         self.uuid = arvan_video_uuid
 
     def send_video_uuid(self):
-        callback_url = sys.argv[5]
-        requests.post(callback_url, json={"video_uuid": self.uuid})
+        try:
+            callback_url = sys.argv[5]
+            requests.put(callback_url, json={"video_uuid": self.uuid})
+        except Exception as e:
+            print(e)
 
     def check_file_is_ready(self, uuid):
         api_key = ArvanVODConfigs.api_key
