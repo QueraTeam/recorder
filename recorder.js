@@ -50,6 +50,8 @@ async function record(fileName, url, username, password) {
         "-ac", "2",
         "-i", "default",
         "-vf", "format=yuv420p",
+        "-c:v", "h264",
+        "-preset:v", "ultrafast",
         `/output/video/${fileName}.mp4`
     ];
 
