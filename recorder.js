@@ -6,7 +6,7 @@ async function record(fileName, url, username, password) {
     var xvfb = new Xvfb({
         reuse: false,
         xvfb_args: [
-            "-screen", "0", "1920x1080x24",
+            "-screen", "0", "1280x720x24",
             "-ac",
             "-nolisten", "tcp",
             "-dpi", "96",
@@ -18,7 +18,7 @@ async function record(fileName, url, username, password) {
     var browser = await puppeteer.launch({
         headless: false,
         executablePath: '/usr/bin/google-chrome',
-        defaultViewport: {width: 1920, height: 1080},
+        defaultViewport: {width: 1280, height: 720},
         ignoreDefaultArgs: [
             "--mute-audio",
             "--enable-automation"
@@ -26,7 +26,7 @@ async function record(fileName, url, username, password) {
         args: [
             "--no-sandbox",
             "--use-fake-ui-for-media-stream",
-            "--window-size=1920,1080",
+            "--window-size=1280,720",
             "--start-fullscreen",
             "--disable-notifications",
         ],
@@ -41,7 +41,7 @@ async function record(fileName, url, username, password) {
     await listenerButton.click();
 
     var options = [
-        "-video_size", "1920x1080",
+        "-video_size", "1280x720",
         "-framerate", "30",
         "-f", "x11grab",
         "-draw_mouse", "0",
@@ -74,3 +74,4 @@ async function record(fileName, url, username, password) {
 const args = process.argv.slice(2);
 const [fileName, username, password, url] = args;
 record(fileName, url, username, password);
+
