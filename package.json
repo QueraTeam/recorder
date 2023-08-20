@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "puppeteer": "^21.0.1",
+    "xvfb": "^0.4.0"
+  }
+}
