@@ -1,4 +1,5 @@
 import os
+import random
 import sys
 import base64
 import time
@@ -41,7 +42,7 @@ class ArvanVODBackend:
             }
         )
 
-        resp = requests.post(ArvanVODConfigs.post_request_new_upload_file, headers=headers)
+        resp = requests.post(ArvanVODConfigs.post_request_new_upload_file, headers=headers, timeout=120)
         if resp.status_code not in [201]:
             raise Exception(resp.json())
 
@@ -52,9 +53,14 @@ class ArvanVODBackend:
     def handle_upload(self, file_identifier, file_type, file_size, file):
         total_bytes_uploaded = 0
         offset = self.offset
-        url = self.create_url(file_identifier, file_type, file_size)
+        try:
+            url = self.create_url(file_identifier, file_type, file_size)
+        except Exception as e:
+            print(e)
+            return "Failed to create upload url", 500
+
         while True:
-            data = file.read(1 * 1024 * 1024)
+            data = file.read(8 * 1024 * 1024)
             if not data:
                 break
             if total_bytes_uploaded + len(data) > int(offset):
@@ -78,7 +84,7 @@ class ArvanVODBackend:
         should_retry = True
         while retried < max_retry:
             try:
-                resp = requests.patch(url, data, headers=headers)
+                resp = requests.patch(url, data, headers=headers, timeout=120)
                 upload_offset = resp.headers.get("upload-offset")
                 if "upload-offset" not in resp.headers:
                     raise Exception("invalid upload-offset. Try again.")
@@ -116,31 +122,24 @@ class ArvanVODBackend:
             "profile_id": None,
             "video_url": None,
         }
-        resp = requests.post(f"{arvan_vod_url}/channels/{channel_key}/videos", json=data, headers=headers)
-        result = resp.json()
-        arvan_video_uuid = result["data"]["id"]
-        self.uuid = arvan_video_uuid
+        try:
+            resp = requests.post(f"{arvan_vod_url}/channels/{channel_key}/videos", json=data, headers=headers, timeout=120)
+            result = resp.json()
+            print(result)
+            arvan_video_uuid = result["data"]["id"]
+            self.uuid = arvan_video_uuid
+            after_upload_successful = True
+        except Exception as e:
+            print(e)
+            after_upload_successful = False
+        return after_upload_successful
 
     def send_video_uuid(self):
         try:
             callback_url = sys.argv[5]
-            requests.put(callback_url, json={"video_uuid": self.uuid})
+            requests.put(callback_url, json={"video_uuid": self.uuid}, timeout=120)
         except Exception as e:
             print(e)
-
-    def check_file_is_ready(self, uuid):
-        api_key = ArvanVODConfigs.api_key
-        arvan_vod_url = ArvanVODConfigs.arvan_vod_url
-        headers = {
-            "Authorization": f"{api_key}",
-            "Accept-Language": "en",
-        }
-        resp = requests.get(f"{arvan_vod_url}/videos/{uuid}", headers=headers)
-        if resp.status_code == 200:
-            result = resp.json()
-            data = result.get("data", {})
-            status = data.get("status")
-            print(status)
 
 
 def run():
@@ -150,10 +149,21 @@ def run():
         file_name = os.path.basename(input_file.name)
         arvan = ArvanVODBackend()
         res, status = arvan.handle_upload(file_name, "video/mp4", file_size, input_file)
-        if status == 200:
-            arvan.after_upload(file_name)
-            arvan.send_video_uuid()
         print(res, status)
 
+        if status == 200:
+            after_upload_successful = arvan.after_upload(file_name)
+            if not after_upload_successful:
+                return False
+            arvan.send_video_uuid()
+        return status == 200
 
-run()
+
+for i in range(4):
+    sleep_time = random.randint(0, 100)
+    print(f"try {i + 1} - sleeping for {sleep_time} seconds.")
+    time.sleep(sleep_time)
+    successful = run()
+    print(successful)
+    if successful:
+        break
